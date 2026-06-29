@@ -12,6 +12,7 @@ ithina-rbac/
     ├── docker-compose.yml     # mongo + api + smartsave (3 containers)
     ├── .env.example
     ├── smartsave/Dockerfile
+    ├── smartsave/nginx.conf
     ├── user-management-api/Dockerfile
     └── scripts/
         ├── setup-vm.sh        # Install Docker on Ubuntu
@@ -253,13 +254,25 @@ Uses Jest + Supertest with in-memory MongoDB.
 
 ## Deployment (Azure Ubuntu VM)
 
-Production deployment uses **three Docker containers** built on the VM from this repository. MongoDB is internal to the Docker network; the API connects via:
+Production deployment runs **three Docker containers** on an Ubuntu VM. Images are built on the VM from this repo (no container registry required). MongoDB stays on the internal Docker network:
 
 ```text
 MONGODB_URI=mongodb://mongo:27017/ithina-user-management
 ```
 
-Detailed guide: **[deploy/README.md](deploy/README.md)**
+Full deploy guide: **[deploy/README.md](deploy/README.md)**
+
+### Quick deploy checklist
+
+| Step | Action |
+|------|--------|
+| 1 | Open Azure NSG inbound rules for **TCP 8080** and **TCP 3002** |
+| 2 | SSH into the VM |
+| 3 | Clone this repository |
+| 4 | Install Docker (once per VM) |
+| 5 | Copy and edit `deploy/.env` |
+| 6 | Run `./deploy/scripts/deploy.sh --seed` |
+| 7 | Open the superadmin login URL in a browser |
 
 ### Deployment architecture
 
@@ -269,25 +282,47 @@ Detailed guide: **[deploy/README.md](deploy/README.md)**
 | `ithina-api` | Built from `user-management-api` | `3002` | REST API |
 | `ithina-smartsave` | Built from `smartsave` | `8080` | Frontend (nginx) |
 
-### Prerequisites (Azure VM)
+### Prerequisites
 
-- Ubuntu 22.04+
-- Inbound NSG rules: **TCP 8080** (frontend), **TCP 3002** (API)
-- Git access to this repository
+- **Azure VM** — Ubuntu 22.04+
+- **Network** — Inbound NSG: **TCP 8080** (frontend), **TCP 3002** (API)
+- **Access** — SSH key for the VM admin user (e.g. `ubuntu`)
+- **Git** — Clone access to this repository
 
-### Step 1 — Install Docker (once per VM)
+### Step 1 — Open network ports (Azure portal)
+
+In the VM’s **Network Security Group**, add inbound rules:
+
+| Priority | Port | Purpose |
+|----------|------|---------|
+| — | **8080** | SmartSave frontend |
+| — | **3002** | User Management API |
+
+### Step 2 — Connect to the VM
+
+```bash
+ssh ubuntu@<YOUR_VM_PUBLIC_IP>
+```
+
+Replace `<YOUR_VM_PUBLIC_IP>` with the VM’s public IP or DNS name.
+
+### Step 3 — Clone the repository
 
 ```bash
 git clone <your-repo-url> ~/ithina-rbac
 cd ~/ithina-rbac
+```
 
+### Step 4 — Install Docker (once per VM)
+
+```bash
 chmod +x deploy/scripts/setup-vm.sh deploy/scripts/deploy.sh
 sudo deploy/scripts/setup-vm.sh
 ```
 
-Log out and back in so your user is in the `docker` group.
+Log out and back in (or run `newgrp docker`) so your user can run Docker without `sudo`.
 
-### Step 2 — Configure environment
+### Step 5 — Configure environment
 
 ```bash
 cp deploy/.env.example deploy/.env
@@ -296,14 +331,16 @@ nano deploy/.env
 
 Set at minimum:
 
-| Variable | Example |
-|----------|---------|
-| `PUBLIC_HOST` | `20.123.45.67` |
-| `JWT_SECRET` | 32+ character random string |
-| `VITE_API_BASE_URL` | `http://20.123.45.67:3002` |
-| `CORS_ORIGIN` | `http://20.123.45.67:8080` |
+| Variable | Example | Notes |
+|----------|---------|-------|
+| `PUBLIC_HOST` | `20.123.45.67` | VM public IP or domain |
+| `JWT_SECRET` | *(32+ random chars)* | Required; change from placeholder |
+| `VITE_API_BASE_URL` | `http://20.123.45.67:3002` | Baked into frontend at **build** time |
+| `CORS_ORIGIN` | `http://20.123.45.67:8080` | Must match the browser URL exactly |
 
-### Step 3 — Build and deploy
+If placeholders remain, `deploy.sh` replaces `YOUR_VM_PUBLIC_IP_OR_DOMAIN` with `PUBLIC_HOST` automatically.
+
+### Step 6 — Build, start, and seed
 
 From the **repository root**:
 
@@ -311,19 +348,28 @@ From the **repository root**:
 ./deploy/scripts/deploy.sh --seed
 ```
 
-Equivalent manual command:
+This will:
+
+1. Build Docker images for the API and frontend
+2. Start `mongo`, `api`, and `smartsave` containers
+3. Wait for the API health check
+4. Load demo tenants, users, roles, and login accounts
+
+Equivalent manual command (without seed):
 
 ```bash
 docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
 ```
 
-Seed demo data (optional, if not using `--seed`):
+Seed demo data later (if you skipped `--seed`):
 
 ```bash
 docker compose -f deploy/docker-compose.yml --env-file deploy/.env --profile seed run --rm seed
 ```
 
-### Step 4 — Verify
+### Step 7 — Verify deployment
+
+On the VM:
 
 ```bash
 curl http://localhost:3002/health
@@ -331,11 +377,25 @@ curl -I http://localhost:8080/
 docker compose -f deploy/docker-compose.yml ps
 ```
 
+From your machine (after NSG rules are open):
+
 | Service | URL |
 |---------|-----|
 | Superadmin login | `http://<PUBLIC_HOST>:8080/superadmin/login` |
 | API health | `http://<PUBLIC_HOST>:3002/health` |
 | Swagger | `http://<PUBLIC_HOST>:3002/api/docs` |
+
+Log in with a seeded account (see [Demo login accounts](#demo-login-accounts-after-seed)).
+
+### Step 8 — Update after code changes
+
+```bash
+cd ~/ithina-rbac
+git pull
+./deploy/scripts/deploy.sh          # rebuild + restart
+# or, if DB should be reset:
+./deploy/scripts/deploy.sh --seed
+```
 
 ### Deployment commands reference
 
@@ -379,6 +439,3 @@ docker compose -f deploy/docker-compose.yml restart api
 ## License
 
 MIT
-
-
-ssh ubuntu@57.159.29.149
