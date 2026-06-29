@@ -1,0 +1,497 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Building2, TrendingUp, AlertTriangle, Target, Layers, ShoppingCart, Cpu, Database, Brain, Cloud, Box, Handshake, Sparkles, Maximize, Minimize, Zap, Users, LineChart, CheckCircle, Rocket, Shield } from "lucide-react";
+import displayDataLogo from "@/assets/displaydata-logo.png";
+import infomilLogo from "@/assets/infomil-logo.webp";
+
+const slides = [
+  {
+    id: 1,
+    type: "title",
+    title: "Building the Future of In-Store Digital Intelligence",
+    subtitle: "DisplayData & Infomil | Strategic Alignment Session",
+  },
+  {
+    id: 2,
+    type: "content",
+    icon: TrendingUp,
+    title: "Retail Is Transforming. This Is Our Moment to Lead.",
+    subtitle: "Setting the Context",
+    points: [
+      "Technology cycles in ESL & smart store ecosystems are accelerating.",
+      "Competitors are entering stores with upgraded capabilities and integrated analytics.",
+      "Retailers expect innovation without operational disruption.",
+      "We have a shared opportunity: Strengthen our partnership, protect the existing base, and unlock new growth.",
+    ],
+  },
+  {
+    id: 3,
+    type: "content",
+    icon: AlertTriangle,
+    title: "The Market Is Moving Quickly — And So Are Competitors",
+    subtitle: "Emerging Challenges",
+    points: [
+      "Retail chains are directly engaging with competing ESL providers.",
+      "Competitors are offering modernised solutions with analytics and AI extensions.",
+      "There is a real threat of customer migration if we don't evolve fast enough.",
+      "Retailers want future-proof solutions without changing infrastructure or adding heavy investments.",
+      "If we don't modernise collaboratively, we risk losing existing stores and upcoming tenders.",
+    ],
+  },
+  {
+    id: 4,
+    type: "content",
+    icon: Target,
+    title: "What We Should Offer Retailers to Strengthen Our Position",
+    subtitle: "The Opportunity for DisplayData & Infomil",
+    points: [
+      "Enable innovation without replacing existing infrastructure.",
+      "Ensure smooth migration to new labels/products without additional hardware.",
+      "Extend current deployments with next-generation capabilities (AI, dashboards, automation).",
+      "Protect retailer investments by ensuring no solution becomes redundant.",
+    ],
+  },
+  {
+    id: 5,
+    type: "pillars",
+    title: "Five Pillars Guiding the Next Chapter",
+    subtitle: "Our Strategic Transformation Model",
+    pillars: [
+      { icon: Layers, title: "Architecture Modernisation", desc: "Modular, scalable, future-ready" },
+      { icon: Cloud, title: "Cloud & Deployment Evolution", desc: "Cloud-agnostic, hybrid-ready" },
+      { icon: Database, title: "Data & AI Platform", desc: "Unifying data into actionable intelligence" },
+      { icon: Cpu, title: "Devices & Edge", desc: "Next-gen ESL and edge compute" },
+      { icon: ShoppingCart, title: "Retail Solutions", desc: "Business-impact applications using 4P + C framework" },
+    ],
+  },
+  {
+    id: 6,
+    type: "framework",
+    title: "4P + C: The Strategic Framework for Our Retail Solutions",
+    framework: "Price | Promotion | Product Placement | Productivity + Compliance",
+    solutions: [
+      {
+        title: "Perishable Waste Management",
+        impact: "Reduces shrink, improves freshness, strengthens sustainability",
+      },
+      {
+        title: "In-Store Advertising & Dynamic Promotions",
+        impact: "Improves campaign execution and boosts engagement at shelf",
+      },
+      {
+        title: "Planogram Compliance",
+        impact: "Improves shelf accuracy, prevents revenue loss from misplacements",
+      },
+      {
+        title: "Smart Tasking & Productivity Tools",
+        impact: "Enhances staff efficiency and improves store execution",
+      },
+    ],
+    tagline: "This framework positions ESL as a business value engine, not just a display.",
+  },
+  {
+    id: 7,
+    type: "content",
+    icon: Cpu,
+    title: "Modernising the Shelf… Without Changing Store Infrastructure",
+    subtitle: "Next-Gen Devices & Edge Intelligence",
+    points: [
+      "Enhanced ESL performance and longevity",
+      "In-built edge compute capability for analytics at the shelf",
+      "Upgraded connectivity and reliability",
+      "Roadmap for new intelligent devices and sensors",
+      "All designed to run on existing store network setups",
+    ],
+  },
+  {
+    id: 8,
+    type: "content",
+    icon: Database,
+    title: "The Foundation for Smart Retail",
+    subtitle: "Data & AI Platform",
+    points: [
+      "Unified data ingestion and processing",
+      "AI/ML models for prediction, automation, and decision support",
+      "Dashboards for store managers, area managers, and HQ",
+      "Supports cross-store comparison and enterprise insights",
+      "Flexible enough to sit on-prem or cloud",
+    ],
+  },
+  {
+    id: 9,
+    type: "highlight",
+    icon: Brain,
+    title: "Introducing DD Brain (New Product Line)",
+    subtitle: "Turning Infomil's Data Warehouse Into a Strategic Superpower",
+    description: "Infomil has built a large, high-quality retail data repository over many years. This data can become the foundation for predictive, operational, and strategic intelligence.",
+    heading: "DD Brain is our new intelligence engine:",
+    points: [
+      "Deployed on-prem (inside retailer or Infomil network)",
+      "Trained on historic + live retail data",
+      "Learns patterns, optimises decisions, and builds predictive models",
+      "Models can then be replicated to cloud to support multiple stores",
+    ],
+  },
+  {
+    id: 10,
+    type: "highlight",
+    icon: Sparkles,
+    title: "A Unique Competitive Edge That No ESL Competitor Offers",
+    subtitle: "DD Brain + Infomil Data Warehouse Advantage",
+    description: "DD Brain uses Infomil's rich data history to build retailer-specific intelligence. Enables actionable insights across:",
+    points: [
+      "Waste reduction",
+      "Promotion effectiveness",
+      "Pricing optimisation",
+      "Staff productivity",
+      "Shelf accuracy and compliance",
+    ],
+    tagline: "Creates an enterprise-level decision layer powered by real data. Solidifies Infomil's position as a long-term technology partner to retailers. Protects stores from switching because the intelligence layer becomes deeply integrated.",
+  },
+  {
+    id: 11,
+    type: "content",
+    icon: Handshake,
+    title: "A Stronger DisplayData–Infomil Collaboration",
+    subtitle: "Combined Partner Path Forward",
+    points: [
+      "Co-create innovative solutions using existing infrastructure.",
+      "Protect current stores by upgrading capabilities, not hardware.",
+      "Use DD Brain + Infomil data as a differentiator against competitors.",
+      "Build new value propositions for new stores and tenders.",
+      "Align on a 12–18-month roadmap for retail intelligence and device evolution.",
+    ],
+  },
+  {
+    id: 12,
+    type: "closing",
+    title: "Together, We Protect Today and Build the Future",
+    points: [
+      "Secure current store deployments",
+      "Win new retail accounts",
+      "Lead the transition to AI-driven in-store intelligence",
+      "Deliver innovation without disruption",
+      "Build the future of connected retail — collaboratively and confidently",
+    ],
+  },
+];
+
+export default function InfomilPresentation() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" && currentSlide < slides.length - 1) {
+        setCurrentSlide(currentSlide + 1);
+      } else if (e.key === "ArrowLeft" && currentSlide > 0) {
+        setCurrentSlide(currentSlide - 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentSlide]);
+
+  const slide = slides[currentSlide];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
+      {/* Header */}
+      <header className="bg-card border-b border-border px-8 py-4 flex items-center justify-between shadow-card">
+        <div className="flex items-center gap-6">
+          <img src={displayDataLogo} alt="DisplayData" className="h-10" />
+          <div className="text-2xl text-muted-foreground font-light">+</div>
+          <img src={infomilLogo} alt="Infomil" className="h-10" />
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="text-base text-muted-foreground font-medium">
+            Slide {currentSlide + 1} of {slides.length}
+          </div>
+          <Button variant="outline" size="sm" onClick={toggleFullscreen}>
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+          </Button>
+        </div>
+      </header>
+
+      {/* Slide Content */}
+      <main className="flex-1 flex items-center justify-center p-8">
+        <div className="w-full max-w-6xl">
+          {slide.type === "title" && (
+            <div className="text-center space-y-12 animate-in fade-in duration-500 relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 rounded-3xl -z-10" />
+              <div className="absolute top-10 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl" />
+              <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl" />
+              
+              <div className="space-y-8 pt-12">
+                <div className="flex items-center justify-center gap-8 mb-8">
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent animate-pulse">
+                    <Building2 className="w-12 h-12 text-white" />
+                  </div>
+                  <Handshake className="w-16 h-16 text-primary/60" />
+                  <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-orange-400 animate-pulse">
+                    <Users className="w-12 h-12 text-white" />
+                  </div>
+                </div>
+                <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent leading-tight px-4">
+                  {slide.title}
+                </h1>
+                <p className="text-3xl md:text-4xl text-muted-foreground font-light">{slide.subtitle}</p>
+              </div>
+              <div className="pt-12 flex items-center justify-center gap-8">
+                <img src={displayDataLogo} alt="DisplayData" className="h-20 opacity-70" />
+                <div className="text-4xl text-muted-foreground/30">×</div>
+                <img src={infomilLogo} alt="Infomil" className="h-20 opacity-70" />
+              </div>
+            </div>
+          )}
+
+          {slide.type === "content" && (
+            <div className="space-y-10 animate-in fade-in duration-500 relative">
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+              {slide.id === 2 && (
+                <div className="absolute top-1/2 right-10 opacity-10">
+                  <LineChart className="w-64 h-64 text-primary" />
+                </div>
+              )}
+              {slide.id === 3 && (
+                <div className="absolute top-1/2 right-10 opacity-10">
+                  <AlertTriangle className="w-64 h-64 text-destructive" />
+                </div>
+              )}
+              {slide.id === 4 && (
+                <div className="absolute top-1/2 right-10 opacity-10">
+                  <Target className="w-64 h-64 text-accent" />
+                </div>
+              )}
+              {slide.id === 7 && (
+                <div className="absolute top-1/2 right-10 opacity-10">
+                  <Cpu className="w-64 h-64 text-primary" />
+                </div>
+              )}
+              {slide.id === 8 && (
+                <div className="absolute top-1/2 right-10 opacity-10">
+                  <Database className="w-64 h-64 text-primary" />
+                </div>
+              )}
+              {slide.id === 11 && (
+                <div className="absolute top-1/2 right-10 opacity-10">
+                  <Handshake className="w-64 h-64 text-primary" />
+                </div>
+              )}
+              <div className="space-y-4">
+                {slide.subtitle && <p className="text-primary font-bold uppercase tracking-wider text-lg">{slide.subtitle}</p>}
+                <div className="flex items-start gap-6">
+                  {slide.icon && (
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0">
+                      <slide.icon className="w-10 h-10 text-white" />
+                    </div>
+                  )}
+                  <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">{slide.title}</h2>
+                </div>
+              </div>
+              <ul className="space-y-6 pl-28">
+                {slide.points?.map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-5 text-2xl text-foreground/90 group">
+                    <span className="w-3 h-3 rounded-full bg-gradient-to-br from-primary to-accent flex-shrink-0 mt-3 group-hover:scale-125 transition-transform" />
+                    <span className="leading-relaxed">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {slide.type === "pillars" && (
+            <div className="space-y-12 animate-in fade-in duration-500">
+              <div className="space-y-4 text-center">
+                {slide.subtitle && <p className="text-primary font-bold uppercase tracking-wider text-lg">{slide.subtitle}</p>}
+                <h2 className="text-5xl md:text-6xl font-bold text-foreground">{slide.title}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-6">
+                {slide.pillars?.map((pillar, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gradient-to-br from-card to-card/50 border-2 border-border rounded-2xl p-8 space-y-5 hover:shadow-2xl hover:border-primary/50 transition-all hover:scale-105 group relative overflow-hidden"
+                  >
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors" />
+                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center relative">
+                      <pillar.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground relative">{pillar.title}</h3>
+                    <p className="text-lg text-muted-foreground leading-relaxed relative">{pillar.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {slide.type === "framework" && (
+            <div className="space-y-10 animate-in fade-in duration-500 relative">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+              <div className="space-y-6">
+                {slide.subtitle && <p className="text-primary font-bold uppercase tracking-wider text-lg">{slide.subtitle}</p>}
+                <h2 className="text-5xl md:text-6xl font-bold text-foreground">{slide.title}</h2>
+                <div className="inline-block p-6 bg-gradient-to-r from-accent/20 to-primary/20 border-2 border-accent/30 rounded-2xl">
+                  <p className="text-3xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">{slide.framework}</p>
+                </div>
+              </div>
+              <div className="space-y-8 pl-8">
+                <p className="text-2xl text-foreground/90 font-semibold">Our solutions drive tangible contextual impact:</p>
+                {slide.solutions?.map((solution, idx) => (
+                  <div key={idx} className="space-y-3 group">
+                    <div className="flex items-start gap-5">
+                      <span className="text-primary text-3xl font-bold group-hover:scale-125 transition-transform">→</span>
+                      <h3 className="text-2xl font-bold text-foreground">{solution.title}</h3>
+                    </div>
+                    <p className="text-xl text-muted-foreground pl-12 leading-relaxed">{solution.impact}</p>
+                  </div>
+                ))}
+              </div>
+              {slide.tagline && (
+                <div className="mt-10 p-8 bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/30 rounded-2xl relative overflow-hidden">
+                  <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+                  <p className="text-2xl font-semibold text-foreground relative">{slide.tagline}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {slide.type === "highlight" && (
+            <div className="space-y-10 animate-in fade-in duration-500 relative">
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
+              {slide.id === 9 && (
+                <div className="absolute bottom-10 right-10 opacity-10">
+                  <Brain className="w-80 h-80 text-accent" />
+                </div>
+              )}
+              {slide.id === 10 && (
+                <div className="absolute bottom-10 right-10 opacity-10">
+                  <Sparkles className="w-80 h-80 text-accent" />
+                </div>
+              )}
+              <div className="space-y-6">
+                {slide.subtitle && <p className="text-primary font-bold uppercase tracking-wider text-lg">{slide.subtitle}</p>}
+                <div className="flex items-start gap-6">
+                  {slide.icon && (
+                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent/60 flex items-center justify-center flex-shrink-0 animate-pulse">
+                      <slide.icon className="w-10 h-10 text-white" />
+                    </div>
+                  )}
+                  <h2 className="text-5xl md:text-6xl font-bold text-foreground leading-tight">{slide.title}</h2>
+                </div>
+              </div>
+              {slide.description && (
+                <p className="text-2xl text-foreground/90 pl-28 leading-relaxed">{slide.description}</p>
+              )}
+              {slide.heading && (
+                <h3 className="text-3xl font-bold text-accent pl-28">{slide.heading}</h3>
+              )}
+              <ul className="space-y-6 pl-28">
+                {slide.points?.map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-5 text-2xl text-foreground/90 group">
+                    <span className="w-3 h-3 rounded-full bg-gradient-to-br from-accent to-accent/60 flex-shrink-0 mt-3 group-hover:scale-125 transition-transform" />
+                    <span className="leading-relaxed">{point}</span>
+                  </li>
+                ))}
+              </ul>
+              {slide.tagline && (
+                <div className="mt-10 p-8 bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-2xl pl-28 relative overflow-hidden">
+                  <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/20 rounded-full blur-2xl" />
+                  <p className="text-2xl font-semibold text-foreground relative leading-relaxed">{slide.tagline}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {slide.type === "closing" && (
+            <div className="text-center space-y-16 animate-in fade-in duration-500 relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 rounded-3xl -z-10" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10" />
+              
+              <div className="space-y-8">
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-primary to-accent mb-8 animate-pulse">
+                  <Handshake className="w-16 h-16 text-white" />
+                </div>
+                <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent leading-tight px-4">
+                  {slide.title}
+                </h1>
+              </div>
+              <div className="max-w-4xl mx-auto">
+                <p className="text-3xl text-foreground/90 mb-12 font-semibold">DisplayData and Infomil can:</p>
+                <ul className="space-y-6 text-left">
+                  {slide.points?.map((point, idx) => (
+                    <li key={idx} className="flex items-center gap-6 text-2xl text-foreground/90 group hover:scale-105 transition-transform">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0 group-hover:shadow-lg transition-shadow">
+                        <span className="text-white font-bold text-xl">{idx + 1}</span>
+                      </div>
+                      <span className="leading-relaxed">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="pt-12 flex items-center justify-center gap-8">
+                <img src={displayDataLogo} alt="DisplayData" className="h-16 opacity-70" />
+                <Handshake className="w-8 h-8 text-primary/40" />
+                <img src={infomilLogo} alt="Infomil" className="h-16 opacity-70" />
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Navigation */}
+      <footer className="bg-card border-t border-border px-8 py-4 flex items-center justify-between shadow-card">
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={() => setCurrentSlide(Math.max(0, currentSlide - 1))}
+          disabled={currentSlide === 0}
+        >
+          <ChevronLeft className="w-5 h-5 mr-2" />
+          Previous
+        </Button>
+
+        <div className="flex gap-2">
+          {slides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`w-2 h-2 rounded-full transition-all ${
+                idx === currentSlide ? "bg-primary w-8" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+              }`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
+
+        <Button
+          variant="default"
+          size="lg"
+          onClick={() => setCurrentSlide(Math.min(slides.length - 1, currentSlide + 1))}
+          disabled={currentSlide === slides.length - 1}
+        >
+          Next
+          <ChevronRight className="w-5 h-5 ml-2" />
+        </Button>
+      </footer>
+    </div>
+  );
+}

@@ -1,0 +1,100 @@
+# Ithina RBAC stack — MongoDB + User Management API + SmartSave frontend
+# Run from repository root:
+#   cp deploy/.env.example deploy/.env   # edit PUBLIC_HOST + secrets
+#   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
+
+name: ithina-rbac
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: ithina-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: ithina-user-management
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ithina-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+  api:
+    build:
+      context: ../user-management-api
+      dockerfile: ../deploy/user-management-api/Dockerfile
+    container_name: ithina-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-3002}:3002"
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      MONGODB_URI: mongodb://mongo:27017/ithina-user-management
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-anjali@ithina.ai}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-SuperAdmin123!}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - ithina-net
+    volumes:
+      - api_logs:/app/logs
+
+  smartsave:
+    build:
+      context: ..
+      dockerfile: deploy/smartsave/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_SUPERADMIN_EMAIL: ${VITE_SUPERADMIN_EMAIL:-anjali@ithina.ai}
+        VITE_SUPERADMIN_PASSWORD: ${VITE_SUPERADMIN_PASSWORD:-SuperAdmin123!}
+    container_name: ithina-smartsave
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - ithina-net
+
+  # One-shot seed (optional): docker compose -f deploy/docker-compose.yml --env-file deploy/.env --profile seed run --rm seed
+  seed:
+    profiles: ["seed"]
+    build:
+      context: ../user-management-api
+      dockerfile: ../deploy/user-management-api/Dockerfile
+    container_name: ithina-seed
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://mongo:27017/ithina-user-management
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-anjali@ithina.ai}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-SuperAdmin123!}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - ithina-net
+    command: ["node", "dist/seed/seed.js"]
+    restart: "no"
+
+networks:
+  ithina-net:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  api_logs:
