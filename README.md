@@ -379,3 +379,6 @@ docker compose -f deploy/docker-compose.yml restart api
 ## License
 
 MIT
+
+
+ssh ubuntu@57.159.29.149
