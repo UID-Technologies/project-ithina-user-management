@@ -224,6 +224,7 @@ Auth token is stored in `sessionStorage`. Sign out clears the token and returns 
 | `JWT_SECRET` | — | Signing secret (min 16 chars) |
 | `JWT_EXPIRES_IN` | `8h` | Token lifetime |
 | `CORS_ORIGIN` | `http://localhost:8080` | Allowed frontend origin |
+| `API_PUBLIC_URL` | `http://localhost:3002` | Public API URL for Swagger (use `http://` without TLS) |
 | `SEED_ADMIN_EMAIL` | `anjali@ithina.ai` | Platform admin seed email |
 | `SEED_ADMIN_PASSWORD` | `SuperAdmin123!` | Platform admin seed password |
 
@@ -432,6 +433,7 @@ docker compose -f deploy/docker-compose.yml restart api
 | API cannot reach MongoDB | URI must use hostname `mongo`, not `localhost`. Check `docker logs ithina-api` |
 | Frontend cannot call API | Rebuild after changing `VITE_API_BASE_URL` in `deploy/.env`. Open NSG port 3002 |
 | CORS errors | `CORS_ORIGIN` must exactly match browser URL, e.g. `http://20.123.45.67:8080` |
+| Swagger blank / SSL errors | Use **http://** not **https://** when TLS is not configured. Rebuild API after fix (`./deploy/scripts/deploy.sh`) |
 | Login fails after deploy | Run seed: `./deploy/scripts/deploy.sh --seed` or seed profile command above |
 
 ---

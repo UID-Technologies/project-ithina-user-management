@@ -39,6 +39,7 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
       CORS_ORIGIN: ${CORS_ORIGIN}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://${PUBLIC_HOST:-localhost}:${API_PORT:-3002}}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-anjali@ithina.ai}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-SuperAdmin123!}
     depends_on:

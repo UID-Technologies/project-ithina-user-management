@@ -9,7 +9,7 @@ const options: swaggerJsdoc.Options = {
       version: '1.0.0',
       description: 'Enterprise RBAC API for the Superadmin Console',
     },
-    servers: [{ url: `http://localhost:${env.PORT}`, description: 'Local' }],
+    servers: [{ url: env.API_PUBLIC_URL, description: 'API' }],
     components: {
       securitySchemes: {
         bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },

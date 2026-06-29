@@ -6,6 +6,8 @@ dotenv.config();
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3002),
+  /** Browser-reachable API base URL (Swagger server list, docs links). */
+  API_PUBLIC_URL: z.string().url().optional(),
   MONGODB_URI: z.string().min(1),
   JWT_SECRET: z.string().min(16),
   JWT_EXPIRES_IN: z.string().default('8h'),
@@ -22,4 +24,9 @@ if (!parsed.success) {
   process.exit(1);
 }
 
-export const env = parsed.data;
+const data = parsed.data;
+
+export const env = {
+  ...data,
+  API_PUBLIC_URL: data.API_PUBLIC_URL ?? `http://localhost:${data.PORT}`,
+};

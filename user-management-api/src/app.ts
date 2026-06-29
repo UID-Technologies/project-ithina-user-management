@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 import { corsConfig } from './config/cors.config';
+import { helmetMiddleware } from './config/helmet.config';
 import { swaggerSpec } from './config/swagger.config';
 import { correlationIdMiddleware } from './common/middlewares/correlation-id.middleware';
 import {
@@ -26,7 +26,7 @@ import searchRoutes from './modules/dashboard/search.routes';
 export function createApp() {
   const app = express();
 
-  app.use(helmet());
+  app.use(helmetMiddleware);
   app.use(cors(corsConfig));
   app.use(express.json());
   app.use(correlationIdMiddleware);
@@ -36,7 +36,15 @@ export function createApp() {
     res.json({ success: true, message: 'OK', data: { status: 'healthy' } });
   });
 
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    '/api/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    }),
+  );
   app.get('/api/docs.json', (_req, res) => res.json(swaggerSpec));
 
   app.use('/api/v1/auth', authRoutes);
